@@ -1,2 +1,5 @@
 #the course book
 *.pdf
+
+#the Virtual Machine for writing code
+*.ova
