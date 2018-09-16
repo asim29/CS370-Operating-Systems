@@ -1,5 +1,5 @@
 #the course book
-*.pdf
+Course_Book.pdf
 
 #the Virtual Machine for writing code
 *.ova
