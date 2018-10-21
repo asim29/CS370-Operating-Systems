@@ -53,7 +53,6 @@ void test(char *path) {
         arg->from = pessengers[i][0];
         arg->to = pessengers[i][1];
         arg->id = i; //train id or user id
-        // printf("%d %d %d\n", arg->id, arg->from, arg->to);
         pthread_create(&tid, NULL, goingFromToP1, (void*) arg);
         args[i] = arg;
         threads[i] = tid;
@@ -71,9 +70,6 @@ void test(char *path) {
         int id, from, to, test_id, test_from, test_to;
         fscanf(temp, "%d %d %d", &id, &from, &to);
         fscanf(test, "%d %d %d", &test_id, &test_from, &test_to);
-        // printf("%d %d %d\n", test_id, test_from, test_to);
-        // printf("%d %d %d\n", id, from, to);
-        // fflush(stdout);
         if(from != test_from || to != test_to) {
             printf("'%s' FAILED\n", path);
             return;
@@ -152,12 +148,81 @@ void test2(char *path) {
     printf("'%s' PASSED\n", path);
 
 }
-void test3() {}
+
+int getEnum(char *val) {
+    char *directions[] = {"NORTH", "SOUTH", "EAST", "WEST"};    
+    char *lanes[] = {"LEFT", "RIGHT"};
+    int i = 0;
+    for(i = 0; i < 4; i++)
+        if(!strcmp(val, directions[i]))
+            return i;
+    for(i = 0; i < 2; i++)
+        if(!strcmp(val, lanes[i]))
+            return i;
+    return -1;
+}
+void test3(char *path) {
+    FILE *test;
+    int NUM_CARS;
+    int i = 0;
+    int j = 0;
+    int pipefd[2];
+    int stdout_bk;
+
+    catch_stdout(pipefd, &stdout_bk);
+    test = fopen(path, "r");
+
+    fscanf(test, "%d", &NUM_CARS);
+    char cars[NUM_CARS][3][6]; 
+    initializeP3();
+
+    for(i = 0; i < NUM_CARS; i++) {
+        fscanf(test, "%s %s %s", cars[i][0], cars[i][1], cars[i][2]);
+    }
+
+    pthread_t threads[NUM_CARS];
+    for(i = 0; i < NUM_CARS; i++) {
+        pthread_t tid;
+        struct argumentP3 *arg = (struct argumentP3*)malloc(sizeof(struct argumentP3));
+        arg->from = getEnum(cars[i][0]);
+        arg->to = getEnum(cars[i][1]);
+        arg->lane = getEnum(cars[i][2]);
+        arg->user_id = i;
+        pthread_create(&tid, NULL, goingFromToP3, (void*) arg);
+        threads[i] = tid;
+    }
+
+    startP3();
+
+    for(i = 0; i < NUM_CARS; i++) {
+        pthread_join(threads[i], NULL);
+    }
+
+    restore_output(pipefd, stdout_bk);
+    char testData[NUM_CARS][3][6];
+    FILE *temp = fdopen(pipefd[0],"r");
+
+    for(i = 0; i < NUM_CARS; i++) {
+        int id, from, to;
+        fscanf(test, "%s %s %s", testData[i][0], testData[i][1], testData[i][2]);
+        //printf("%s %s %s here\n", testData[i][0], testData[i][1], testData[i][2]);
+    }
+
+    for(i = 0; i < NUM_CARS; i++) {
+        char answers[3][6];
+        fscanf(temp, "%s %s %s", answers[0], answers[1], answers[2]);       
+        if(strcmp(answers[0], testData[i][0]) || strcmp(answers[1], testData[i][1]) || strcmp(answers[2], testData[i][2])) {
+            printf("'%s' FAILED\n", path);
+            return;
+        }
+    }
+
+    printf("'%s' PASSED\n", path);
+}
 
 int main() {
-    // test("test1"); 
+    test("test1"); 
     fflush(stdout);
     test2("test2");
-    fflush(stdout);
-    test3();
+    // test3("test3");
 }
