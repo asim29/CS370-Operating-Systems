@@ -3,3 +3,8 @@ Course_Book.pdf
 
 #the Virtual Machine for writing code
 *.ova
+
+#Files for submission
+*.zip
+
+Lecture_Slides/

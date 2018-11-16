@@ -199,7 +199,7 @@ void test3(char *path) {
     }
 
     restore_output(pipefd, stdout_bk);
-    char testData[NUM_CARS][3][6];
+    char testData[NUM_CARS][    3][6];
     FILE *temp = fdopen(pipefd[0],"r");
 
     for(i = 0; i < NUM_CARS; i++) {
@@ -221,8 +221,8 @@ void test3(char *path) {
 }
 
 int main() {
-    test("test1"); 
+    // test("test1"); 
+    // test2("test2");
+    test3("test3");
     fflush(stdout);
-    test2("test2");
-    // test3("test3");
 }
