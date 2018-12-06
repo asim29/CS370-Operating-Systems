@@ -30,30 +30,51 @@ int main(){
 
     while(!feof(fp)){
         fscanf(fp,"%x",&addr);
-        printf("Logical Address: %x ", addr);
         fscanf(fp,"%d",&rw);
-        printf(" Read/Write: %d ",rw);
         unsigned int last16 = bitExtracted(addr,16,1);
         unsigned int offset = bitExtracted(last16,8,1);
         unsigned int pageNo = bitExtracted(last16,8,9);
-        printf("Page Number: %d ", pageNo);
-        printf("Offset: %d \n", offset);
 
         if(pageTable[pageNo][0] == 'G' && pageTable[pageNo][1] == 'G'){
             pageFaults++;
-            (lastIndex++ % 62);
             //Get data from backign store
-            fseek(store,pageNo*256,SEEK_SET);
-            // printf("%ld\n",ftell(store));
-            char data[256];
-            fread(&data,1,256,store);
-            // printf("%d\n",data);
-            for (size_t i = 0 ; i < 256 ; ++i) {
-                fprintf(stdout, "0x%02x ", data[i]);
-                if ((i + 1) % 8 == 0) {
-                    fputc('\n', stdout);
-                }
+            fseek(store,pageNo*64,SEEK_SET);
+            char data[64];
+            fread(&data,1,64,store);
+            
+            // for(size_t i = 0 ; i < 64 ; ++i) {
+                // fprintf(stdout, "0x%x ", data[i]);
+                // if ((i + 1) % 8 == 0) {
+            //         fputc('\n', stdout);
+            //     }
+            // }
+            
+            // memory[lastIndex] = data;
+            for(size_t i=0; i<64;i++){
+                memory[lastIndex][i] = data[i];
             }
+
+            for(size_t i = 0; i < 256;i++){
+                char a = pageTable[i][0];
+                char b = pageTable[i][1];
+                if(hexToDec(pageTable[i]) == lastIndex){
+                    pageTable[i][0] = 'G';
+                    pageTable[i][1] = 'G';
+                }
+            }    
+            lastIndex = (lastIndex+1) % 62;
+            printf("Logical Address: %x ", addr);
+            // printf(" Read/Write: %d ",rw);
+            // printf("Page Number: %d ", pageNo);
+            // printf("Offset: %d \n", offset);
+            printf("Page Fault: True \n");
+        }
+        else{
+            printf("Logical Address: %x ", addr);
+            // printf(" Read/Write: %d ",rw);
+            // printf("Page Number: %d ", pageNo);
+            // printf("Offset: %d \n", offset);
+            printf("Page Fault: False \n");
         }
 
     }
