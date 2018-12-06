@@ -44,9 +44,16 @@ int main(){
             (lastIndex++ % 62);
             //Get data from backign store
             fseek(store,pageNo*256,SEEK_SET);
+            // printf("%ld\n",ftell(store));
             char data[256];
             fread(&data,1,256,store);
-            printf("%s\n",data);
+            // printf("%d\n",data);
+            for (size_t i = 0 ; i < 256 ; ++i) {
+                fprintf(stdout, "0x%02x ", data[i]);
+                if ((i + 1) % 8 == 0) {
+                    fputc('\n', stdout);
+                }
+            }
         }
 
     }
