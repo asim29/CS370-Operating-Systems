@@ -27,9 +27,15 @@ int main(){
         unsigned int pageNo = bitExtracted(last16,8,9);
         printf("Page Number: %d ", pageNo);
         printf("Offset: %d \n", offset);
-        // break;
-    }
 
+        char pageTable[256][2];
+        char memory[62][256];
+
+        int i,j;
+        for(i=0;i<256;i++){
+            pageTable[i][0] = '0';
+        }
+    }
     return 0;
 }
 
@@ -37,7 +43,6 @@ int main(){
 // HELPER FUNCTIONS //
 void printBin(unsigned int n){ 
     unsigned int displayMask = 1 << 31;
-
     unsigned int c;
     for(c =1; c<=32;c++){
         putchar(n & displayMask ? '1' : '0');
