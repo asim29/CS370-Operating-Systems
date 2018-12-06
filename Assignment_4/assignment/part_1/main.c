@@ -7,6 +7,7 @@
 void printArray(unsigned int* arr,int N);
 void printBin(unsigned int n);
 int bitExtracted(unsigned int number, int k, int p);
+int hexToDec(char* num);
 // ------------------------------ //
 
 
@@ -16,6 +17,14 @@ int main(){
     int rw;
 
     fp = fopen("addresses.txt","r");
+    int pageFaults = 0;
+    char pageTable[256][2];
+    char memory[62][256];
+    int i,j;
+
+    for(i=0;i<256;i++){
+        pageTable[i][0] = '0';
+    }
 
     while(!feof(fp)){
         fscanf(fp,"%x",&addr);
@@ -28,13 +37,11 @@ int main(){
         printf("Page Number: %d ", pageNo);
         printf("Offset: %d \n", offset);
 
-        char pageTable[256][2];
-        char memory[62][256];
-
-        int i,j;
-        for(i=0;i<256;i++){
-            pageTable[i][0] = '0';
+        if(pageTable[pageNo][0] == 'G' && pageTable[pageNo][1] == 'G'){
+            pageFaults++;
+            
         }
+
     }
     return 0;
 }
@@ -65,4 +72,23 @@ void printArray(unsigned int* arr, int N){
 int bitExtracted(unsigned int number, int k, int p) { 
      return (((1 << k) - 1) & (number >> (p - 1)));
 } 
+
+int hexToDec(char* num){
+    int len = strlen(num);
+    int base = 1;
+    int dec = 0;
+    int i;
+
+    for(i=len-1;i>=0;i--){
+        if(number[i]) >= '0' && number[i] <= '9'){
+            dec += (base*(number[i] - 48));
+            base*=16;
+        }
+        else if(number[i] >= 'A' && number[i] <= 'F'){
+            dec+= (base*(number[i] - 55));
+            base*=16;
+        }
+        return dec;
+    }
+}
 // -------------------------------- //
