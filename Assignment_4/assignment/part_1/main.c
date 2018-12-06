@@ -12,18 +12,20 @@ int hexToDec(char* num);
 
 
 int main(){
-    FILE* fp;
+    FILE* fp,*store;
     unsigned int addr;
     int rw;
 
     fp = fopen("addresses.txt","r");
+    store = fopen("BACKING_STORE.bin","r");
     int pageFaults = 0;
     char pageTable[256][2];
     char memory[62][256];
     int i,j;
-
+    int lastIndex = 0;
     for(i=0;i<256;i++){
-        pageTable[i][0] = '0';
+        pageTable[i][0] = 'G';
+        pageTable[i][1] = 'G';
     }
 
     while(!feof(fp)){
@@ -39,7 +41,12 @@ int main(){
 
         if(pageTable[pageNo][0] == 'G' && pageTable[pageNo][1] == 'G'){
             pageFaults++;
-            
+            (lastIndex++ % 62);
+            //Get data from backign store
+            fseek(store,pageNo*256,SEEK_SET);
+            char data[256];
+            fread(&data,1,256,store);
+            printf("%s\n",data);
         }
 
     }
@@ -80,12 +87,12 @@ int hexToDec(char* num){
     int i;
 
     for(i=len-1;i>=0;i--){
-        if(number[i]) >= '0' && number[i] <= '9'){
-            dec += (base*(number[i] - 48));
+        if(num[i] >= '0' && num[i] <= '9'){
+            dec += (base*(num[i] - 48));
             base*=16;
         }
-        else if(number[i] >= 'A' && number[i] <= 'F'){
-            dec+= (base*(number[i] - 55));
+        else if(num[i] >= 'A' && num[i] <= 'F'){
+            dec+= (base*(num[i] - 55));
             base*=16;
         }
         return dec;
