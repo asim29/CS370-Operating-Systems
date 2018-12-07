@@ -14,7 +14,7 @@ int main(){
     int rw;
     while(!feof(fp)){
         fscanf(fp,"%x",&addr);
-        addr = addr&0xFFFF;
+        addr = bitExtracted(addr,24,1);
         fscanf(fp,"%d",&rw);
         printf("Logical Address: 0x%X ", addr);
         unsigned int outerPageIndex = bitExtracted(addr,6,1);
