@@ -164,9 +164,9 @@ int main(void)
 				// printf(line);
         		char *hist_line = strdup(hist[rear-1]);
 
-        		printf("Line from history: ");
-        		printf(hist_line);
-        		fflush(stdout);
+        		// printf("Line from history: ");
+        		// printf(hist_line);
+        		// fflush(stdout);
 
 				int numArgs = parse(strdup(hist_line),args);
 				int conc = checkAndRemoveAmpersand(args,numArgs);
