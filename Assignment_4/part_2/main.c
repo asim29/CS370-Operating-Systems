@@ -17,9 +17,9 @@ int main(){
         addr = bitExtracted(addr,24,1);
         fscanf(fp,"%d",&rw);
         printf("Logical Address: 0x%X ", addr);
-        unsigned int outerPageIndex = bitExtracted(addr,6,1);
-        unsigned int innerPageIndex = bitExtracted(addr,8,7);
-        unsigned int offset = bitExtracted(addr,10,8);
+        unsigned int outerPageIndex = bitExtracted(addr,6,19);
+        unsigned int innerPageIndex = bitExtracted(addr,8,11);
+        unsigned int offset = bitExtracted(addr,10,1);
         printf("Outer Page Index : %d ", outerPageIndex);
         printf("Inner Page Index : %d ", innerPageIndex);
         printf("Offset : %d\n", offset);
