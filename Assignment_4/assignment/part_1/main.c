@@ -19,65 +19,70 @@ int main(){
     fp = fopen("addresses.txt","r");
     store = fopen("BACKING_STORE.bin","r");
     int pageFaults = 0;
-    char pageTable[256][2];
+    float hits = 0.0;
+    int totalRefs = 0;
+
+    unsigned int pageTable[256];
     char memory[62][256];
     int i,j;
     int lastIndex = 0;
     for(i=0;i<256;i++){
-        pageTable[i][0] = 'G';
-        pageTable[i][1] = 'G';
+        pageTable[i] = -1;
     }
 
     while(!feof(fp)){
         fscanf(fp,"%x",&addr);
+        addr = addr&0xFFFF;
         fscanf(fp,"%d",&rw);
         unsigned int last16 = bitExtracted(addr,16,1);
         unsigned int offset = bitExtracted(last16,8,1);
         unsigned int pageNo = bitExtracted(last16,8,9);
-
-        if(pageTable[pageNo][0] == 'G' && pageTable[pageNo][1] == 'G'){
-            pageFaults++;
-            //Get data from backign store
-            fseek(store,pageNo*64,SEEK_SET);
-            char data[64];
-            fread(&data,1,64,store);
+        totalRefs++;
+        if(pageTable[pageNo] == -1){
+            pageFaults++;            //Get data from backing store
+            fseek(store,pageNo*256,SEEK_SET);
+            char data[256];
+            fread(&data,1,256,store);
             
-            // for(size_t i = 0 ; i < 64 ; ++i) {
-                // fprintf(stdout, "0x%x ", data[i]);
-                // if ((i + 1) % 8 == 0) {
-            //         fputc('\n', stdout);
-            //     }
-            // }
-            
-            // memory[lastIndex] = data;
-            for(size_t i=0; i<64;i++){
+            for(size_t i=0; i<256;i++){
                 memory[lastIndex][i] = data[i];
             }
 
             for(size_t i = 0; i < 256;i++){
-                char a = pageTable[i][0];
-                char b = pageTable[i][1];
-                if(hexToDec(pageTable[i]) == lastIndex){
-                    pageTable[i][0] = 'G';
-                    pageTable[i][1] = 'G';
+                if(pageTable[i] == lastIndex){
+                    pageTable[i] = -1;
                 }
-            }    
+            }
+
+            pageTable[pageNo] = lastIndex;
             lastIndex = (lastIndex+1) % 62;
-            printf("Logical Address: %x ", addr);
+            int value = memory[pageTable[pageNo]][offset];
+            value >= 0xFFFFFF00 ? value-=0xFFFFFF00 : value;
+
+            printf("Logical Address: 0x%X ", addr);
+            printf("Phsyical Address: 0x%X%X ", pageTable[pageNo],offset);
+            printf("Value: 0x%X ", value);
             // printf(" Read/Write: %d ",rw);
             // printf("Page Number: %d ", pageNo);
             // printf("Offset: %d \n", offset);
             printf("Page Fault: True \n");
         }
         else{
-            printf("Logical Address: %x ", addr);
+            hits++;
+            int value = memory[pageTable[pageNo]][offset];
+            value >= 0xFFFFFF00 ? value-=0xFFFFFF00 : value;
+            printf("Logical Address: 0x%X ", addr);
+            printf("Phsyical Address: 0x%X%X ", pageTable[pageNo],offset);            
             // printf(" Read/Write: %d ",rw);
             // printf("Page Number: %d ", pageNo);
             // printf("Offset: %d \n", offset);
+            printf("Value: 0x%X ", value);
             printf("Page Fault: False \n");
         }
-
     }
+    printf("Total Page Faults: %d\n", pageFaults);
+    printf("Hit rate: %f\n",hits/totalRefs * 100.0);
+    printf("Fault rate: %f\n",100.0 - hits/totalRefs * 100.0);
     return 0;
 }
 
